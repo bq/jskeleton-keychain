@@ -1,0 +1,34 @@
+{
+    "name": "locker",
+    "version": "0.0.1",
+    "description": "",
+    "main": "dist/index.html",
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:bq/locker.git"
+    },
+    "ignore": [
+        "bower_components",
+        "node_modules",
+        ".tmp",
+        "*.log",
+        ".DS_Store",
+        ".idea",
+        ".gitignore",
+        ".travis.yml",
+        ".editorconfig"
+    ],
+    "dependencies": {
+    },
+    "authors": [
+        "front-end bq <front-end@bq.com>"
+    ],
+    "keywords": [
+        "Jskeleton",
+        "Plugin",
+        "marionette",
+        "extension",
+        "component",
+        "jskeleton"
+    ]
+}
