@@ -1,7 +1,9 @@
 /**
  * jskeleton-Keychain
  *
- * A simple & configurable abstraction for local/session storage in jskeleton projects.
+ * Local/session storage manager for jskeleton projects.
+ * ------------------------------------------------------------------------------------
+ * - Based on @tymondesigns angular-locker https://github.com/tymondesigns/angular-locker.git
  *
  * @link
  * @author Jorge Serrano  @Enderlab
@@ -20,12 +22,12 @@
         });
     } else if (typeof module !== 'undefined' && module.exports) {
 
-        var JSkeleton = require('jskeleton');
+        var JSkeleton = require('JSkeleton');
 
         module.exports = factory(root, JSkeleton);
 
     } else if (root !== undefined) {
-        factory.call(root, root, root.Jskeleton);
+        factory.call(root, root, root.JSkeleton);
     }
 
 })(this, function(root, JSkeleton) {
@@ -36,42 +38,24 @@
 
     /* jshint unused: false */
     //  -------------------------------
-    //  EXAMPLE
+    //  KEYCHAIN
     //  -------------------------------
-    var JskeletonKeychain = {};
 
-    //  jskeleton-Keychain.Foo = function(bar){
-    //      return bar;
-    //  }
-    //  Expose jskeleton-Keychain to JSkeleton
-    //  -------------------------------
-    //  JSkeleton.jskeleton-Keychain = jskeleton-Keychain;
-    //
-    //
-    //  Register as a JSkeleton plugin to require as a new dependency
-    //  -------------------------------------------------------------
-    //  JSkeleton.plugin('jskeleton-Keychain', jskeleton-Keychain.Foo);
-    //
-    //  Register the instantiated jskeleton-Keychain.Foo as a dependency into the global JSkeleton injector
-    //  --------------------------------------------------------------------------------------------
-    //  JSkeleton.di.inject({
-    //      'jskeleton-Keychain': jskeleton-Keychain.Foo
-    //  });
-    //
-    //
 
     function Keychain(options){
 
 
         // Set the defaults
-        this._options = {
-            driver : options.local || 'local',
-            namespace: options.namespace || 'Keychain',
-            eventsEnabled: options.eventsEnabled || true,
-            separator: options.separator || '.',
+        this._defaultParams = {
+            driver : 'local',
+            namespace: 'Keychain',
+            eventsEnabled:  true,
+            separator: '.',
             extend: {}
         };
 
+
+        this._options = _.extend(this._defaultParams, options);
 
         // If value is a function then execute, otherwise return
         this._value = function(value,param){
@@ -94,8 +78,9 @@
         // Out of the box drivers
         this._registeredDrivers = _.extend({
             local : window.localStorage,
-            session: window.sessionStorage
-        },options.extend);
+            session: window.sessionStorage,
+            cookie : window.document.cookie
+        },this._options.extend);
 
 
         // Get the Storage instance from the key
@@ -108,15 +93,15 @@
         };
 
         // The driver instance
-        this._driver = this._resolveDriver(options.driver);
+        this._driver = this._resolveDriver(this._options.driver);
 
 
         // The namespace value
-        this._namespace = options.namespace;
+        this._namespace = this._options.namespace;
 
 
         // Separates the namespace from the keys
-        this._separator = options.separator;
+        this._separator = this._options.separator;
 
 
         // Store the watchers here so we can un-register them later
@@ -156,7 +141,7 @@
         this._serialize = function(value){
 
             try {
-                return JSON.parse(value);
+                return JSON.stringify(value);
             } catch(e){
                 return value;
             }
@@ -167,7 +152,7 @@
         this._unserialize = function(value){
 
             try {
-                return JSON.stringify(value);
+                return JSON.parse(value);
             }catch(e){
                 return value;
             }
@@ -187,6 +172,7 @@
 
 
         // Add to storage
+        // http://stackoverflow.com/questions/2010892/storing-objects-in-html5-localstorage
         this._setItem = function(key,value){
 
             if (! this._checkSupport()){
@@ -195,12 +181,15 @@
 
             try {
                 var oldVal = this._getItem(key);
+
                 this._driver.setItem(this._getPrefix(key), this._serialize(value));
+
                 if (this._exists(key) && ! _.isEqual(oldVal, value)) {
                     this._event('Keychain.item.updated', { key: key, oldValue: oldVal, newValue: value });
                 }else{
                     this._event('Keychain.item.added', { key: key, value: value });
                 }
+
             }catch(e){
                 if (['QUOTA_EXCEEDED_ERR', 'NS_ERROR_DOM_QUOTA_REACHED', 'QuotaExceededError'].indexOf(e.name) !== -1) {
                     this._error('The browser storage quota has been exceeded');
@@ -223,7 +212,7 @@
 
 
         // Exists in storage
-        this._exist = function(key){
+        this._exists = function(key){
 
             if(! this._checkSupport()){
                 this._error('The browser does not support localStorage');
@@ -267,11 +256,11 @@
             key = this._value(key);
 
             if (_.isObject(key)) {
-                _.forEach(key, function (value, key) {
+                _.each(key, function (value, key) {
                     this._setItem(key, this._defined(value) ? value : def);
                 }, this);
             } else {
-                if (! this._defined(value)){ 
+                if (! this._defined(value)){
                     return false;
                 }
 
@@ -298,7 +287,7 @@
         get: function (key, def) {
             if (_.isArray(key)) {
                 var items = {};
-                _.forEach(key, function (k) {
+                _.each(key, function (k) {
                     if (this.has(k)) {
                         items[k] = this._getItem(k);
                     }
@@ -347,17 +336,20 @@
         // Return all items in storage within the current namespace/driver
         all: function () {
             var items = {};
-            _.forEach(this._driver, function (value, key) {
-                if (this._namespace) {
+            var key;
+            for ( var i = 0, len = this._driver.length; i < len; ++i ) {
+
+              if (this._namespace) {
                     var prefix = this._namespace + this._separator;
-                    if (key.indexOf(prefix) === 0){ 
-                        key = key.substring(prefix.length);
+                    if (this._driver.key( i ).indexOf(prefix) === 0){
+                        key = this._driver.key( i ).substring(prefix.length);
                     }
                 }
                 if (this.has(key)){
                     items[key] = this.get(key);
                 }
-            }, this);
+            }
+
 
             return items;
         },
@@ -388,41 +380,10 @@
             return this.keys().length;
         },
 
-        // Bind a storage key to a $scope property
-        /*bind: function ($scope, key, def) {
-            if (! _defined( $scope.$eval(key) )) {
-                $parse(key).assign($scope, this.get(key, def));
-                if (! this.has(key)) this.put(key, def);
-            }
-
-            var self = this;
-            this._watchers[key + $scope.$id] = $scope.$watch(key, function (newVal) {
-                self.put(key, newVal);
-            }, angular.isObject($scope[key]));
-
-            return this;
-        },
-
-        // Unbind a storage key from a $scope property
-        unbind: function ($scope, key) {
-            $parse(key).assign($scope, void 0);
-            this.forget(key);
-
-            var watchId = key + $scope.$id;
-
-            if (this._watchers[watchId]) {
-                // execute the de-registration function
-                this._watchers[watchId]();
-                delete this._watchers[watchId];
-            }
-
-            return this;
-        },
-        */
         // Set the storage driver on a new instance to enable overriding defaults
         driver: function (driver) {
             // no need to create a new instance if the driver is the same
-            if (driver === this._options.driver){ 
+            if (driver === this._options.driver){
                 return this;
             }
 
@@ -438,7 +399,7 @@
         // Set the namespace on a new instance to enable overriding defaults
         namespace: function (namespace) {
             // no need to create a new instance if the namespace is the same
-            if (namespace === this._namespace){ 
+            if (namespace === this._namespace){
                 return this;
             }
 
@@ -457,18 +418,20 @@
             return this._checkSupport(driver);
         },
 
-        // Get a new instance of Locker
+        // Get a new instance of Keychain
         instance: function (options) {
             return new Keychain(options);
         }
     };
+    
 
-
-
-    // Expose an global instance
+    //Add to global scope
     JSkeleton.Keychain = new Keychain();
 
+    //Add Keychain as JSkeleton.Extension
+    JSkeleton.Extension.add('Keychain',{ async : false , factory: true });
 
-    return JSkeleton.Keychain;
+
+    return JSkeleton.Keychain; 
 
 });
