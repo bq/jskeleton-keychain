@@ -20,7 +20,7 @@ $ npm install jskeleton-keychain
 
 <h4 id="installation-manual">manual</h4>
 
-Simply download the zip file [HERE](https://github.com/tymondesigns/jskeleton-keychain/archive/master.zip) and include `dist/jskeleton-keychain.min.js` in your project.
+Simply download the zip file [HERE](https://github.com/bq/jskeleton-keychain/archive/master.zip) and include `dist/jskeleton-keychain.min.js` in your project.
 
 
 <h2 id="usage">Usage</h2>
