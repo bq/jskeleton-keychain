@@ -12,13 +12,13 @@
  */
 (function(root, factory) {
     'use strict';
-    /*globals require, define, module */
+    /*globals require, define, module, Backbone, _ */
     /* jshint unused: false */
 
     if (typeof define === 'function' && define.amd) {
         define(['jskeleton'
         ], function(JSkeleton) {
-            return factory.call(root, root, JSkeleton);
+            return factory.call(root, JSkeleton);
         });
     } else if (typeof module !== 'undefined' && module.exports) {
 
@@ -27,7 +27,7 @@
         module.exports = factory(root, JSkeleton);
 
     } else if (root !== undefined) {
-        factory.call(root, root, root.JSkeleton);
+        factory.call(root,root, root.JSkeleton);
     }
 
 })(this, function(root, JSkeleton) {
@@ -41,8 +41,10 @@
     //  KEYCHAIN
     //  -------------------------------
 
+    JSkeleton.Keychain = {};
 
-    function Keychain(options){
+    //Add to global scope
+    function Keychain (){
 
 
         // Set the defaults
@@ -54,8 +56,14 @@
             extend: {}
         };
 
+        this._options = _.extend(this._defaultParams, JSkeleton.common.get('Keychain'));
 
-        this._options = _.extend(this._defaultParams, options);
+
+         // Attach events
+        if (this._options.eventsEnabled){
+            _.extend(this, Backbone.Events);
+        }
+
 
         // If value is a function then execute, otherwise return
         this._value = function(value,param){
@@ -162,11 +170,11 @@
         // Trigger an event
         this._event = function(name,payload){
             if (this._options.eventsEnabled){
-                console.log('envento lanzado:');
-                console.log({
+
+                this.trigger(name,_.extend(payload, {
                     driver : this._options.driver,
                     namespace : this._namespace
-                });
+                }));
             }
         };
 
@@ -185,9 +193,9 @@
                 this._driver.setItem(this._getPrefix(key), this._serialize(value));
 
                 if (this._exists(key) && ! _.isEqual(oldVal, value)) {
-                    this._event('Keychain.item.updated', { key: key, oldValue: oldVal, newValue: value });
+                    this._event(this._namespace+'.item.updated', { key: key, oldValue: oldVal, newValue: value });
                 }else{
-                    this._event('Keychain.item.added', { key: key, value: value });
+                    this._event(this._namespace+'.item.added', { key: key, value: value });
                 }
 
             }catch(e){
@@ -234,7 +242,7 @@
             }
 
             this._driver.removeItem(this._getPrefix(key));
-            this._event('Keychain.item.forgotten', { key: key });
+            this._event(this._namespace+'.item.forgotten', { key: key });
 
             return true;
 
@@ -423,15 +431,12 @@
             return new Keychain(options);
         }
     };
-    
-
-    //Add to global scope
-    JSkeleton.Keychain = new Keychain();
-
-    //Add Keychain as JSkeleton.Extension
-    JSkeleton.Extension.add('Keychain',{ async : false , factory: true });
 
 
-    return JSkeleton.Keychain; 
+    //Add Keychain as JSkeleton.Extension to use like dependency inside apps
+    JSkeleton.extension.add('Keychain',{ factory: true , extensionClass: Keychain });
+
+
+    return JSkeleton.Keychain;
 
 });

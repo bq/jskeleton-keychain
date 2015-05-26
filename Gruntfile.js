@@ -3,7 +3,7 @@
 
 'use strict';
 
-/* globals require, module */
+/* globals require, module, grunt */
 
 // # Globbing
 // for performance reasons we're only matching one level down:
@@ -13,25 +13,21 @@
 
 module.exports = function(grunt) {
 
-    // Init main modular gruntfile and return the tasks
-    //require('grunt-jskeleton')(grunt);
-
-    grunt.config.merge({
-        // Include here your plugins configuration
-    });
-
-    
-    // Custom tasks
-    // grunt.registerTask('task-name', []);
+    // Project configuration.
     grunt.initConfig({
-        uglify: {
-            myTarget: {
-                files: {
-                    'dest/output.min.js': ['src/*.js']
-                 }
-             }
+      uglify: {
+        my_target: {
+          files: {
+            'dist/keychain.min.js': ['src/keychain.js']
+          }
         }
+      }
     });
 
-    grunt.registerTask('dist', ['uglify']);
+    grunt.loadNpmTasks('grunt-contrib-uglify');
+
+    // Internal tasks
+    grunt.registerTask('build', 'Internal use only', [
+        'uglify'
+    ]);
 };
