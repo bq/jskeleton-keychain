@@ -1,6 +1,6 @@
 {
-  "name": "Jskeleton-Keychain",
-  "version": "0.1.0",
+  "name": "jskeleton-keychain",
+  "version": "0.1.1",
   "description": "",
   "main": "src/keychain.js",
   "repository": {
