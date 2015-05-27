@@ -22,7 +22,7 @@
         });
     } else if (typeof module !== 'undefined' && module.exports) {
 
-        var JSkeleton = require('JSkeleton');
+        var JSkeleton = require('jskeleton');
 
         module.exports = factory(root, JSkeleton);
 
