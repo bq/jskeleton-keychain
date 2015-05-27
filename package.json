@@ -1,6 +1,6 @@
 {
   "name": "jskeleton-keychain",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "",
   "main": "src/keychain.js",
   "repository": {
@@ -41,7 +41,7 @@
     "sinon": "latest",
     "grunt-mocha-cli": "^1.13.0",
     "should": "^6.0.3",
-    "grunt-contrib-uglify": "^0.9.1",
+    "grunt-contrib-uglify": "^0.9.1"
   },
   "engines": {
     "node": "^0.10.0",
