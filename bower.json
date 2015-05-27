@@ -1,34 +1,33 @@
 {
-    "name": "jskeleton-keychain",
-    "version": "0.1.0",
-    "description": "",
-    "main": "src/keychain.js",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/bq/jskeleton-keychain"
-    },
-    "ignore": [
-        "bower_components",
-        "node_modules",
-        ".tmp",
-        "*.log",
-        ".DS_Store",
-        ".idea",
-        ".gitignore",
-        ".travis.yml",
-        ".editorconfig"
-    ],
-    "dependencies": {
-    },
-    "authors": [
-        "front-end bq <front-end@bq.com>"
-    ],
-    "keywords": [
-        "Jskeleton",
-        "Plugin",
-        "marionette",
-        "extension",
-        "component",
-        "jskeleton"
-    ]
+  "name": "jskeleton-keychain",
+  "version": "0.1.1",
+  "description": "",
+  "main": "src/keychain.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bq/jskeleton-keychain"
+  },
+  "ignore": [
+    "bower_components",
+    "node_modules",
+    ".tmp",
+    "*.log",
+    ".DS_Store",
+    ".idea",
+    ".gitignore",
+    ".travis.yml",
+    ".editorconfig"
+  ],
+  "dependencies": {},
+  "authors": [
+    "front-end bq <front-end@bq.com>"
+  ],
+  "keywords": [
+    "Jskeleton",
+    "Plugin",
+    "marionette",
+    "extension",
+    "component",
+    "jskeleton"
+  ]
 }
