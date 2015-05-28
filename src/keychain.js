@@ -16,21 +16,23 @@
     /* jshint unused: false */
 
     if (typeof define === 'function' && define.amd) {
-        define(['jskeleton'
-        ], function(JSkeleton) {
-            return factory.call(root, JSkeleton);
+        define(['jskeleton',
+            'backbone'
+        ], function(JSkeleton, Backbone) {
+            return factory.call(root, JSkeleton, Backbone);
         });
     } else if (typeof module !== 'undefined' && module.exports) {
 
-        var JSkeleton = require('jskeleton');
+        var JSkeleton = require('jskeleton'),
+            Backbone = require('backbone');
 
-        module.exports = factory(root, JSkeleton);
+        module.exports = factory(root, JSkeleton, Backbone);
 
     } else if (root !== undefined) {
-        factory.call(root,root, root.JSkeleton);
+        factory.call(root, root, root.JSkeleton, root.Backbone);
     }
 
-})(this, function(root, JSkeleton) {
+})(this, function(root, JSkeleton, Backbone) {
 
     'use strict';
 
@@ -44,7 +46,7 @@
     JSkeleton.Keychain = {};
 
     //Add to global scope
-    function Keychain (){
+    function Keychain (options){
 
 
         // Set the defaults
@@ -56,7 +58,12 @@
             extend: {}
         };
 
+        // Set options by configuration file
         this._options = _.extend(this._defaultParams, JSkeleton.common.get('Keychain'));
+
+
+        // Set options by constructor
+        if(options) this._options = _.extend(this._defaultParams, options);
 
 
          // Attach events
@@ -395,7 +402,7 @@
                 return this;
             }
 
-            return this.instance(_.extend(this._options, { driver: driver }));
+            return this.instance(_.extend(this._options,{ driver: driver }));
         },
 
         // Get the currently set driver
