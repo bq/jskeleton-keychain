@@ -356,21 +356,21 @@ For the latest browser compatibility chart see [HERE](http://caniuse.com/nameval
 
 <h2 id="contributing">Contributing</h2>
 
-In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using Gulp.
+In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using Grunt.
 
 <h2 id="development">Development</h2>
 
 ```bash
 $ npm install
 $ bower install
-$ gulp
+$ grunt
 ```
 
 <h2 id="license">License</h2>
 
 The MIT License (MIT)
 
-Copyright (c) 2014 Sean Tymon
+Copyright (c) 2014 BQ
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
